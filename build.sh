@@ -23,7 +23,7 @@ mkdir -p $OBJDIR
 OBJECTS=()
 for SOURCE in "${SOURCES[@]}"; do
     OBJFILE="${OBJDIR}/$(basename ${SOURCE%.*}.o)"
-    g++ -c "$SOURCE" -o "$OBJFILE" -std=c++17
+    g++ -c "$SOURCE" -o "$OBJFILE" -std=c++17 -O3
     if [ $? -ne 0 ]; then
         echo "Compilation of $SOURCE failed"
         exit 1
@@ -32,7 +32,7 @@ for SOURCE in "${SOURCES[@]}"; do
 done
 
 # Link all object files into the final executable
-g++ "${OBJECTS[@]}" -lpthread -o $OUTPUT
+g++ "${OBJECTS[@]}" -lpthread -O3 -o $OUTPUT
 if [ $? -eq 0 ]; then
     echo "Build successful"
 else
