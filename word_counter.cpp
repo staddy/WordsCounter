@@ -88,6 +88,8 @@ WordCounter::countWordsInFile(const std::string &filePath) {
   std::streampos previous = 0;
   for (size_t i = 0; i < threadCount; ++i) {
     std::streampos start = previous;
+    if (start >= fileSize)
+      break;
     std::streampos end = (i + 1) * chunkSize;
     if (start >= end)
       continue;
