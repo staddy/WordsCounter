@@ -15,15 +15,11 @@ public:
   bool hasNext() const override;
 
 private:
-  static constexpr size_t ChunkSize = 4096 * 1024;
   void advance();
-  bool readChunk();
 
   ConcurrentFileReader m_fileReader;
   std::size_t m_currentPosition;
   std::size_t m_end;
-  std::string m_chunk;
-  std::size_t m_chunkPosition;
   std::string m_currentWord;
 };
 

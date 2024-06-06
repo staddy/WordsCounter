@@ -24,20 +24,10 @@ bool ConcurrentFileWordStream::hasNext() const {
   return !m_currentWord.empty();
 }
 
-bool ConcurrentFileWordStream::readChunk() {
-  if (m_currentPosition >= m_end)
-    return false;
-  std::size_t chunkEnd = std::min(m_currentPosition + ChunkSize, m_end);
-  m_chunk = m_fileReader.readChunk(m_currentPosition, chunkEnd);
-  m_currentPosition = chunkEnd;
-  m_chunkPosition = 0;
-  return true;
-}
-
 void ConcurrentFileWordStream::advance() {
   m_currentWord.clear();
-  while (m_chunkPosition < m_chunk.size() || readChunk()) {
-    auto symbol = m_chunk[m_chunkPosition++];
+  while (m_currentPosition < m_end) {
+    auto symbol = m_fileReader.fileData[m_currentPosition++];
     if (('A' <= symbol && symbol <= 'Z') || ('a' <= symbol && symbol <= 'z')) {
       if (symbol < 'a')
         symbol += ('a' - 'A');

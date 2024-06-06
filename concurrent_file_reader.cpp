@@ -1,7 +1,7 @@
 #include "concurrent_file_reader.hpp"
 
 ConcurrentFileReader::ConcurrentFileReader()
-    : m_fileSize(0), m_isOpen(false), m_fileData(nullptr) {}
+    : m_fileSize(0), m_isOpen(false), fileData(nullptr) {}
 
 ConcurrentFileReader::ConcurrentFileReader(const std::string &filename)
     : ConcurrentFileReader() {
@@ -26,8 +26,8 @@ void ConcurrentFileReader::close() {
   }
 
 #ifdef _WIN32
-  if (m_fileData) {
-    UnmapViewOfFile(m_fileData);
+  if (fileData) {
+    UnmapViewOfFile(fileData);
   }
   if (m_hMapFile) {
     CloseHandle(m_hMapFile);
@@ -36,8 +36,8 @@ void ConcurrentFileReader::close() {
     CloseHandle(m_hFile);
   }
 #else
-  if (m_fileData && m_fileData != MAP_FAILED) {
-    munmap(const_cast<char *>(m_fileData), m_fileSize);
+  if (fileData && fileData != MAP_FAILED) {
+    munmap(const_cast<char *>(fileData), m_fileSize);
   }
   if (m_fd != -1) {
     ::close(m_fd);
@@ -45,7 +45,7 @@ void ConcurrentFileReader::close() {
 #endif
 
   m_isOpen = false;
-  m_fileData = nullptr;
+  fileData = nullptr;
   m_fileSize = 0;
 }
 
@@ -61,7 +61,7 @@ std::string ConcurrentFileReader::readChunk(std::size_t start,
     end = m_fileSize;
   }
 
-  return std::string(m_fileData + start, m_fileData + end);
+  return std::string(fileData + start, fileData + end);
 }
 
 std::size_t ConcurrentFileReader::size() const { return m_fileSize; }
@@ -88,9 +88,9 @@ void ConcurrentFileReader::init(const std::string &filename) {
     throw std::runtime_error("Error creating file mapping.");
   }
 
-  m_fileData = static_cast<const char *>(
+  fileData = static_cast<const char *>(
       MapViewOfFile(m_hMapFile, FILE_MAP_READ, 0, 0, m_fileSize));
-  if (!m_fileData) {
+  if (!fileData) {
     CloseHandle(m_hMapFile);
     CloseHandle(m_hFile);
     throw std::runtime_error("Error mapping the file into memory.");
@@ -111,9 +111,9 @@ void ConcurrentFileReader::init(const std::string &filename) {
     throw std::runtime_error("Error getting the file size.");
   }
 
-  m_fileData = static_cast<const char *>(
+  fileData = static_cast<const char *>(
       mmap(nullptr, m_fileSize, PROT_READ, MAP_PRIVATE, m_fd, 0));
-  if (m_fileData == MAP_FAILED) {
+  if (fileData == MAP_FAILED) {
     ::close(m_fd);
     throw std::runtime_error("Error mapping the file into memory.");
   }

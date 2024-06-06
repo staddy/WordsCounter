@@ -27,13 +27,13 @@ public:
   void close();
   std::string readChunk(std::size_t start, std::size_t end);
   std::size_t size() const;
+  const char *fileData;
 
 private:
   void init(const std::string &filename);
 
   std::size_t m_fileSize;
   bool m_isOpen;
-  const char *m_fileData;
 
 #ifdef _WIN32
   HANDLE m_hFile;
